@@ -51,7 +51,7 @@ jobs:
           pip install pytest
 
       - name: Ejecutar pruebas unitarias
-        run: pytest app/tests/
+        run: pytest app/test/
 
   package:
     runs-on: ubuntu-latest
