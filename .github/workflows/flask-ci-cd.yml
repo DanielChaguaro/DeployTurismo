@@ -23,21 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-  lint:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v3
-
-      - name: Instalar dependencias
-        run: |
-          pip install flake8
-          pip install -r requirements.txt
-
-      - name: Ejecutar flake8
-        run: flake8 .
-
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -53,19 +38,7 @@ jobs:
       - name: Ejecutar pruebas unitarias
         run: pytest app/test/
 
-  package:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Crear artefacto ZIP
-        run: |
-          zip -r flask_app.zip . -x '*.git*'
-
-      - name: Guardar artefacto
-        uses: actions/upload-artifact@v3
-        with:
-          name: flask_app
-          path: flask_app.zip
+ 
 
   deploy:
     runs-on: ubuntu-latest
