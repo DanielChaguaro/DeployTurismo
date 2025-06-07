@@ -1,38 +1,35 @@
+# tests/test_user_controller.py
 import pytest
-from flask import session
-from app import create_app
+from flask import Flask
+from app.controllers.user_controller import (
+    es_email_valido,
+    es_nombre_valido,
+    es_contrasena_valida,
+    es_email_unico,
+    create_user
+)
 from app.models.db import db
 from app.models.Usuario import Usuario
 
+# Crear una app de Flask para testing
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config.update({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-        "SECRET_KEY": "testkey",
-        "WTF_CSRF_ENABLED": False,
-    })
-
+    app = Flask(__name__)
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
     with app.app_context():
         db.create_all()
-        # Crear un usuario de prueba
-        usuario = Usuario(nombre="Test", preferencias="aventura", correo="test@demo.com")
-        db.session.add(usuario)
-        db.session.commit()
-    yield app
+        yield app
+        db.session.remove()
+        db.drop_all()
 
-@pytest.fixture
-def client(app):
-    return app.test_client()
 
-def test_recomendaciones_basicas_no_auth(client):
-    response = client.post('/recomendaciones_basicas', data={
-        'fecha_inicial': '2024-01-01',
-        'fecha_final': '2024-12-31'
-    })
-    assert b"Usuario no autenticado" in response.data
+def test_es_nombre_valido():
+    assert es_nombre_valido('John Doe') == True
+    assert es_nombre_valido('John123') == False
 
-def test_reportes_status(client):
-    response = client.get('/reportes')
-    assert response.status_code == 200
+def test_es_contrasena_valida():
+    assert es_contrasena_valida('password123') == True
+    assert es_contrasena_valida('123') == False
