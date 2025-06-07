@@ -32,4 +32,4 @@ def test_es_nombre_valido():
 
 def test_es_contrasena_valida():
     assert es_contrasena_valida('password123') == True
-    assert es_contrasena_valida('123') == False
+    assert es_contrasena_valida('123') == False 
